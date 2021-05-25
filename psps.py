@@ -191,17 +191,21 @@ player = {
 }
 
 
-def useItem(index):
-    if player['Inventory'][index]['Quantity'] > 0:
-        if index == 0:
-            player['HP'] += 30
-            print("Healed for 30 HP!")
-        elif index == 1:
-            player['Buffed'] = True
-            print("Doing bonus damage!")
-        player['Inventory'][index]['Quantity'] -= 1
-    else:
-        print(f"You don't have {player['Inventory'][index]['Name']}!")
+def useItem(itemName):
+    for i in range(0, len(player['Inventory'])):
+        if player['Inventory'][i]['Name'] == itemName:
+            if player['Inventory'][i]['Quantity'] > 0:
+                if itemName == 'HP Potion':
+                    player['HP'] += 30
+                    print("Healed for 30 HP!")
+                elif itemName == "Attack Boost Potion":
+                    player['Buffed'] = True
+                    print("Doing bonus damage!")
+
+                player['Inventory'][i]['Quantity'] -= 1
+                return
+            else:
+                print(f"You don't have {player['Inventory'][i]['Name']}!")
 
 
 def buyingItems(shop, index):
@@ -234,19 +238,20 @@ def combat(enemy):
         print("1) Attack")
         print("2) Use item")
 
-        playerChoice = int(input())
+        playerChoice = getPlayerInput()
 
         if playerChoice == 1:
             attack(player, enemy)
             if enemy['HP'] <= 0:
                 break
         elif playerChoice == 2:
-            i = 1
-            for x in player['Inventory']:
-                print(f"{i}) {x}")
-                i = i + 1
+            for i in range(0, len(player['Inventory'])):
+                if player['Inventory'][i]['Type'] == 'Consumable':
+                    print(
+                        f"{i + 1}) {player['Inventory'][i]['Name']} - {player['Inventory'][i]['Quantity']}")
             itemChoice = int(input())
-            useItem(itemChoice - 1)
+            print(player['Inventory'][itemChoice - 1]['Name'])
+            useItem(player['Inventory'][itemChoice - 1]['Name'])
 
         print("The enemy is about to attack you.")
         time.sleep(1)
@@ -262,13 +267,21 @@ def combat(enemy):
     dropsXP(enemy)
 
 
+def getPlayerInput():
+    try:
+        playerChoice = int(input())
+        return playerChoice
+    except ValueError:
+        return
+
+
 def main():
     print("Where would you like to go?")
     print("1) Forest")
     print("2) Town")
     print("3) Check stats")
     print("4) Quit")
-    playerChoice = int(input())
+    playerChoice = getPlayerInput()
     if playerChoice == 1:
         enemy = generateEnemy()
         combat(enemy)
