@@ -3,6 +3,9 @@ import time
 
 
 def attack(attacker, enemy):
+    if random.randint(0, 100) < 30:
+        print("Missed!")
+        return
     isCritical = random.randint(0, 100) <= 30
     damage = random.randint(attacker['Level'], attacker['Level'] + 4)
     if attacker['Buffed']:
@@ -123,12 +126,9 @@ def combat(enemy):
 
         print("The enemy is about to attack you.")
         time.sleep(1)
-        if random.randint(0, 70):
-            attack(enemy, player)
-            if player['HP'] <= 0:
-                break
-        else:
-            print("They missed!")
+        attack(enemy, player)
+        if player['HP'] <= 0:
+            break
 
     if player['HP'] <= 0:
         print("YOU DIED")
