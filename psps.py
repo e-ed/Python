@@ -153,10 +153,12 @@ def shopGenerator():
 
     randomShop = []
 
-    for i in range(len(shopItems) - 1):
+    for i in range(0, len(shopItems)):
         if random.randint(0, 100) >= 50:
             randomShop.append(shopItems[i])
 
+    while len(randomShop) < 3:
+        randomShop.append(shopItems[random.randint(0, 6)])
     return randomShop
 
 
