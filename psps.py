@@ -209,7 +209,7 @@ def buyingItems(shop, index):
         return
     if player['Money'] >= shop[index]['Price']:
         for i in range(0, len(player['Inventory'])):
-            if shop[index]['Name'] in player['Inventory'][i].values():
+            if shop[index]['Name'] in player['Inventory'][i].values() and shop[index]['Type'] == "Consumable":
                 player['Inventory'][i]['Quantity'] += 1
                 print(f"Bought {shop[index]['Name']}!")
                 player['Money'] -= shop[index]['Price']
