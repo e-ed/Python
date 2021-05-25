@@ -203,9 +203,10 @@ def useItem(index):
 
 
 def buyingItems(shop, index):
+    if index == -1:
+        return
     if player['Money'] >= shop[index]['Price']:
-        i = 0
-        for i in range(len(player['Inventory']) - 1):
+        for i in range(0, len(player['Inventory'])):
             if shop[index]['Name'] in player['Inventory'][i].values():
                 player['Inventory'][i]['Quantity'] += 1
                 print(f"Bought {shop[index]['Name']}!")
@@ -284,6 +285,7 @@ def main():
                 elif shop[i]['Type'] == 'Armor':
                     print(f"Defense Rating: {shop[i]['Defense Rating']}")
                 print(f"\tPrice: {shop[i]['Price']}")
+            print("0) Return")
 
             print(f"Your money: {player['Money']}")
             playerChoice = int(input())
