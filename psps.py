@@ -158,7 +158,7 @@ def shopGenerator():
             randomShop.append(shopItems[i])
 
     while len(randomShop) < 3:
-        randomShop.append(shopItems[random.randint(0, 6)])
+        randomShop.append(shopItems[random.randint(0, len(randomShop) - 1)])
     return randomShop
 
 
@@ -212,11 +212,15 @@ def buyingItems(shop, index):
             if shop[index]['Name'] in player['Inventory'][i].values():
                 player['Inventory'][i]['Quantity'] += 1
                 print(f"Bought {shop[index]['Name']}!")
+                player['Money'] -= shop[index]['Price']
+                print(f"You spent {shop[index]['Price']} coins")
                 return
-            else:
-                player['Inventory'].append(shop[index])
-                print(f"Bought {shop[index]['Name']}!")
-                return
+
+        player['Inventory'].append(shop[index])
+        print(f"Bought {shop[index]['Name']}!")
+        player['Money'] -= shop[index]['Price']
+        print(f"You spent {shop[index]['Price']} coins")
+        return
 
 
 def combat(enemy):
@@ -294,7 +298,7 @@ def main():
             buyingItems(shop, playerChoice - 1)
     elif playerChoice == 3:
         print(
-            f"HP: {player['HP']}\nLevel: {player['Level']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}")
+            f"HP: {player['HP']}\nLevel: {player['Level']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}")
         print("Inventory: ")
         for i in range(0, len(player['Inventory'])):
             print(
