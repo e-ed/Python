@@ -66,7 +66,7 @@ def generateEnemy():
             "XPDrop": 100,
             "Buffed": False,
             "Equipped": [
-                {"Weapon": 0},
+                {"Weapon": 5},
                 {"Shield": 0},
             ]
         },
@@ -79,7 +79,7 @@ def generateEnemy():
             "XPDrop": 10,
             "Buffed": False,
             "Equipped": [
-                {"Weapon": 0},
+                {"Weapon": 2},
                 {"Shield": 0},
             ]
         },
@@ -92,7 +92,7 @@ def generateEnemy():
             "XPDrop": 300,
             "Buffed": False,
             "Equipped": [
-                {"Weapon": 0},
+                {"Weapon": 10},
                 {"Shield": 0},
             ]
         },
@@ -148,6 +148,46 @@ def shopGenerator():
             "Price": 1,
             "Quantity": 1,
             "Type": 'Armor',
+        },
+
+        {
+            "Name": "Silver Shield",
+            "Defense Rating": random.randint(2, 4),
+            "Price": 2,
+            "Quantity": 1,
+            "Type": 'Armor',
+        },
+
+        {
+            "Name": "Gold Shield",
+            "Defense Rating": random.randint(1, 20),
+            "Price": 10,
+            "Quantity": 1,
+            "Type": 'Armor',
+        },
+
+        {
+            "Name": "Rune Sword",
+            "Attack Damage": random.randint(7, 15),
+            "Price": 10,
+            "Quantity": 1,
+            "Type": 'Weapon',
+        },
+
+        {
+            "Name": "Dragon Sword",
+            "Attack Damage": random.randint(55, 105),
+            "Price": 500,
+            "Quantity": 1,
+            "Type": 'Weapon',
+        },
+
+        {
+            "Name": "Plastic Sword",
+            "Attack Damage": random.randint(1, 2),
+            "Price": 5,
+            "Quantity": 1,
+            "Type": 'Weapon',
         },
 
     ]
