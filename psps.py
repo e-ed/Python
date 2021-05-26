@@ -16,6 +16,7 @@ def attack(attacker, enemy):
     if isCritical:
         damage *= 1.5
         print("Critical hit!")
+    damage -= enemy['Equipped'][1]['Shield']
     print(f"{attacker['Name']} dealt {damage} damage to {enemy['Name']}")
     enemy['HP'] -= damage
     print(f"{enemy['Name']} has {enemy['HP']} HP left!")
@@ -84,7 +85,7 @@ def generateEnemy():
         },
 
         {
-            "Name": "dragon",
+            "Name": "Dragon",
             "HP": 30,
             "Mana": 50,
             "Level": random.randint(5, 15),
@@ -167,14 +168,24 @@ player = {
     "HP": 100,
     "Mana": 100,
     "Inventory": [
-        {"Name": "HP Potion", "Quantity": 1, "Type": "Consumable"},
-        {"Name": "Attack Boost Potion", "Quantity": 1, "Type": "Consumable"},
+        {"Name": "HP Potion", "Quantity": 1, "Price": 1, "Type": "Consumable"},
+        {"Name": "Attack Boost Potion", "Price": 1,
+            "Quantity": 1, "Type": "Consumable"},
         {
             "Name": "Bronze Sword",
             "Attack Damage": random.randint(1, 3),
             "Price": 2,
             "Quantity": 1,
+            "Price": 2,
             "Type": 'Weapon',
+        },
+        {
+            "Name": "Bronze Shield",
+            "Defense Rating": random.randint(1, 3),
+            "Price": 1,
+            "Quantity": 1,
+            "Type": 'Armor',
+            "Price": 2,
         },
 
     ],
@@ -225,6 +236,36 @@ def buyingItems(shop, index):
         player['Money'] -= shop[index]['Price']
         print(f"You spent {shop[index]['Price']} coins")
         return
+
+
+def sellingItems():
+    for i in range(0, len(player['Inventory'])):
+        print(
+            f"\t{i}) {player['Inventory'][i]['Name']} - {player['Inventory'][i]['Quantity']}")
+        if player['Inventory'][i]['Type'] == 'Weapon':
+            print(
+                f"\t\tAttack Damage: {player['Inventory'][i]['Attack Damage']}")
+
+        if player['Inventory'][i]['Type'] == 'Armor':
+            print(
+                f"\t\tDefense Rating: {player['Inventory'][i]['Defense Rating']}")
+    print("What would you like to sell?")
+    playerChoice = getPlayerInput()
+
+    print(f"Selling {player['Inventory'][playerChoice]['Name']}")
+    if player['Inventory'][playerChoice]['Type'] == 'Consumable':
+        if player['Inventory'][playerChoice]['Quantity'] > 0:
+            player['Inventory'][playerChoice]['Quantity'] -= 1
+            player['Money'] += player['Inventory'][playerChoice]['Price']
+            print(f"Got {player['Inventory'][playerChoice]['Price']} coins")
+        else:
+            print(
+                f"You don't have any {player['Inventory'][playerChoice]['Name']}!")
+    elif player['Inventory'][playerChoice]['Type'] == 'Weapon' or player['Inventory'][playerChoice]['Type'] == 'Armor':
+        player['Money'] += player['Inventory'][playerChoice]['Price']
+        print(f"Got {player['Inventory'][playerChoice]['Price']} coins")
+        player['Inventory'].remove(player['Inventory'][playerChoice])
+    return
 
 
 def combat(enemy):
@@ -304,14 +345,20 @@ def main():
                 elif shop[i]['Type'] == 'Armor':
                     print(f"Defense Rating: {shop[i]['Defense Rating']}")
                 print(f"\tPrice: {shop[i]['Price']}")
+            i = i + 2
+            print(f"{i}) Sell items")
             print("0) Return")
 
             print(f"Your money: {player['Money']}")
             playerChoice = int(input())
-            buyingItems(shop, playerChoice - 1)
+            # if playerChoice == len(shop) + 1, that is selling items
+            if playerChoice != (len(shop) + 1):
+                buyingItems(shop, playerChoice - 1)
+            else:
+                sellingItems()
     elif playerChoice == 3:
         print(
-            f"HP: {player['HP']}\nLevel: {player['Level']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}")
+            f"HP: {player['HP']}\nLevel: {player['Level']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
         print("Inventory: ")
         for i in range(0, len(player['Inventory'])):
             print(
@@ -324,6 +371,8 @@ def main():
             if player['Inventory'][i]['Type'] == 'Armor':
                 print(
                     f"\t\tDefense Rating: {player['Inventory'][i]['Defense Rating']}")
+                if player['Inventory'][i]['Defense Rating'] > player['Equipped'][1]['Shield']:
+                    player['Equipped'][1]['Shield'] = player['Inventory'][i]['Defense Rating']
 
     elif playerChoice == 4:
         exit()
