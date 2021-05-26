@@ -7,7 +7,7 @@ def attack(attacker, enemy):
         print("Missed!")
         return
     isCritical = random.randint(0, 100) <= 30
-    damage = random.randint(attacker['Level'], attacker['Level'] + 4)
+    damage = random.randint(attacker['Level'] - 5, attacker['Level'] + 5)
     damage += attacker['Equipped'][0]['Weapon']
     print(f"{attacker['Equipped'][0]['Weapon']} attack damage bonus")
     if attacker['Buffed']:
@@ -16,10 +16,15 @@ def attack(attacker, enemy):
     if isCritical:
         damage *= 1.5
         print("Critical hit!")
-    damage -= enemy['Equipped'][1]['Shield']
-    print(f"{attacker['Name']} dealt {damage} damage to {enemy['Name']}")
-    enemy['HP'] -= damage
-    print(f"{enemy['Name']} has {enemy['HP']} HP left!")
+    damage -= (enemy['Equipped'][1]['Shield'] / 4)
+
+    if damage < 0:
+        damage = 0
+        print(f"{enemy['Name']} blocked the attack!")
+    else:
+        print(f"{attacker['Name']} dealt {damage} damage to {enemy['Name']}")
+        enemy['HP'] -= damage
+        print(f"{enemy['Name']} has {enemy['HP']} HP left!")
 
 
 def dropsXP(enemy):
@@ -33,67 +38,72 @@ def generateEnemy():
     enemiesList = [
         {
             "Name": "Goblin",
-            "HP": 10,
+            "HP": 10 + random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "Mana": 10,
-            "Level": random.randint(1, 5),
+            "Level": random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "XPDrop": 5,
             "Buffed": False,
             "Equipped": [
                 {"Weapon": 0},
-                {"Shield": 0},
+                {"Shield": random.randint(
+                    player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
             ]
 
         },
 
         {
             "Name": "Zombie",
-            "HP": 12,
+            "HP": 10 + random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "Mana": 10,
-            "Level": random.randint(3, 6),
+            "Level": random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "XPDrop": 10,
             "Buffed": False,
             "Equipped": [
                 {"Weapon": 0},
-                {"Shield": 0},
+                {"Shield": random.randint(
+                    player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
             ]
         },
 
         {
             "Name": "Cookie Monster",
-            "HP": 1,
+            "HP": 10 + random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "Mana": 10,
-            "Level": random.randint(40, 50),
+            "Level": random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "XPDrop": 100,
             "Buffed": False,
             "Equipped": [
                 {"Weapon": 5},
-                {"Shield": 0},
+                {"Shield": random.randint(
+                    player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
             ]
         },
 
         {
             "Name": "Skeleton",
-            "HP": 15,
+            "HP": 10 + random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "Mana": 10,
-            "Level": random.randint(2, 7),
+            "Level": random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "XPDrop": 10,
             "Buffed": False,
             "Equipped": [
                 {"Weapon": 2},
-                {"Shield": 0},
+                {"Shield": random.randint(
+                    player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
             ]
         },
 
         {
             "Name": "Dragon",
-            "HP": 30,
+            "HP": 10 + random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "Mana": 50,
-            "Level": random.randint(5, 15),
+            "Level": random.randint(player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5),
             "XPDrop": 300,
             "Buffed": False,
             "Equipped": [
                 {"Weapon": 10},
-                {"Shield": 0},
+                {"Shield": random.randint(
+                    player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
             ]
         },
     ]
@@ -262,20 +272,22 @@ def useItem(itemName):
 def buyingItems(shop, index):
     if index == -1:
         return
-    if player['Money'] >= shop[index]['Price']:
-        for i in range(0, len(player['Inventory'])):
-            if shop[index]['Name'] in player['Inventory'][i].values() and shop[index]['Type'] == "Consumable":
-                player['Inventory'][i]['Quantity'] += 1
-                print(f"Bought {shop[index]['Name']}!")
-                player['Money'] -= shop[index]['Price']
-                print(f"You spent {shop[index]['Price']} coins")
-                return
-
+    try:
+        if player['Money'] >= shop[index]['Price']:
+            for i in range(0, len(player['Inventory'])):
+                if shop[index]['Name'] in player['Inventory'][i].values() and shop[index]['Type'] == "Consumable":
+                    player['Inventory'][i]['Quantity'] += 1
+                    print(f"Bought {shop[index]['Name']}!")
+                    player['Money'] -= shop[index]['Price']
+                    print(f"You spent {shop[index]['Price']} coins")
+                    return
         player['Inventory'].append(shop[index])
         print(f"Bought {shop[index]['Name']}!")
         player['Money'] -= shop[index]['Price']
         print(f"You spent {shop[index]['Price']} coins")
         return
+    except IndexError:
+        print("Invalid item!")
 
 
 def sellingItems():
@@ -292,45 +304,57 @@ def sellingItems():
     print("What would you like to sell?")
     playerChoice = getPlayerInput()
 
-    print(f"Selling {player['Inventory'][playerChoice]['Name']}")
-    if player['Inventory'][playerChoice]['Type'] == 'Consumable':
-        if player['Inventory'][playerChoice]['Quantity'] > 0:
-            player['Inventory'][playerChoice]['Quantity'] -= 1
+    try:
+        print(f"Selling {player['Inventory'][playerChoice]['Name']}")
+        if player['Inventory'][playerChoice]['Type'] == 'Consumable':
+            if player['Inventory'][playerChoice]['Quantity'] > 0:
+                player['Inventory'][playerChoice]['Quantity'] -= 1
+                player['Money'] += player['Inventory'][playerChoice]['Price']
+                print(
+                    f"Got {player['Inventory'][playerChoice]['Price']} coins")
+            else:
+                print(
+                    f"You don't have any {player['Inventory'][playerChoice]['Name']}!")
+        elif player['Inventory'][playerChoice]['Type'] == 'Weapon' or player['Inventory'][playerChoice]['Type'] == 'Armor':
             player['Money'] += player['Inventory'][playerChoice]['Price']
             print(f"Got {player['Inventory'][playerChoice]['Price']} coins")
-        else:
-            print(
-                f"You don't have any {player['Inventory'][playerChoice]['Name']}!")
-    elif player['Inventory'][playerChoice]['Type'] == 'Weapon' or player['Inventory'][playerChoice]['Type'] == 'Armor':
-        player['Money'] += player['Inventory'][playerChoice]['Price']
-        print(f"Got {player['Inventory'][playerChoice]['Price']} coins")
-        player['Inventory'].remove(player['Inventory'][playerChoice])
-    return
+            player['Inventory'].remove(player['Inventory'][playerChoice])
+        return
+    except IndexError:
+        print("Invalid item!")
 
 
 def combat(enemy):
     print(
-        f"You found an enemy! It is a level {enemy['Level']} {enemy['Name'] }")
+        f"You found an enemy! It is a level {enemy['Level']} {enemy['Name'] } with {enemy['HP']} HP")
 
     while (enemy["HP"] > 0 and player['HP'] > 0):
 
         print(f"You: Level {player['Level']} HP: {player['HP']}")
 
-        print("1) Attack")
-        print("2) Use item")
-
-        playerChoice = getPlayerInput()
+        while True:
+            print("1) Attack")
+            print("2) Use item")
+            playerChoice = getPlayerInput()
+            if playerChoice == 1 or playerChoice == 2:
+                break
 
         if playerChoice == 1:
             attack(player, enemy)
             if enemy['HP'] <= 0:
                 break
         elif playerChoice == 2:
-            for i in range(0, len(player['Inventory'])):
-                if player['Inventory'][i]['Type'] == 'Consumable':
-                    print(
-                        f"{i + 1}) {player['Inventory'][i]['Name']} - {player['Inventory'][i]['Quantity']}")
-            itemChoice = int(input())
+            while True:
+                try:
+                    for i in range(0, len(player['Inventory'])):
+                        if player['Inventory'][i]['Type'] == 'Consumable':
+                            print(
+                                f"{i + 1}) {player['Inventory'][i]['Name']} - {player['Inventory'][i]['Quantity']}")
+                    itemChoice = getPlayerInput()
+                    if player['Inventory'][itemChoice - 1] in player['Inventory'] and player['Inventory'][itemChoice - 1]['Type'] == 'Consumable':
+                        break
+                except IndexError:
+                    print("Invalid item!")
             print(player['Inventory'][itemChoice - 1]['Name'])
             useItem(player['Inventory'][itemChoice - 1]['Name'])
 
