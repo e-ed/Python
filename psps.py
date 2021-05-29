@@ -3,6 +3,7 @@ import time
 
 
 def attack(attacker, target):
+    print("aaa")
     # dodge chance based on dexterity
     if random.randint(0, 100) <= target['Stats'][1]['Value']:
         print("Missed!")
