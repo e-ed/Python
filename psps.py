@@ -2,29 +2,31 @@ import random
 import time
 
 
-def attack(attacker, enemy):
-    if random.randint(0, 100) < 30:
+def attack(attacker, target):
+    # dodge chance based on dexterity
+    if random.randint(0, 100) <= target['Stats'][1]['Value']:
         print("Missed!")
         return
     isCritical = random.randint(0, 100) <= 30
     damage = random.randint(attacker['Level'] - 5, attacker['Level'] + 5)
     damage += attacker['Equipped'][0]['Weapon']
-    print(f"{attacker['Equipped'][0]['Weapon']} attack damage bonus")
+    damage += (attacker['Stats'][0]['Value'] * 0.5)  # strength bonus
+    # print(f"{attacker['Equipped'][0]['Weapon']} attack damage bonus") #equipped sword
     if attacker['Buffed']:
         print("Bonus damage!")
         damage += 1
     if isCritical:
         damage *= 1.5
         print("Critical hit!")
-    damage -= (enemy['Equipped'][1]['Shield'] / 4)
+    damage -= (target['Equipped'][1]['Shield'] / 4)
 
     if damage < 0:
         damage = 0
-        print(f"{enemy['Name']} blocked the attack!")
+        print(f"{target['Name']} blocked the attack!")
     else:
-        print(f"{attacker['Name']} dealt {damage} damage to {enemy['Name']}")
-        enemy['HP'] -= damage
-        print(f"{enemy['Name']} has {enemy['HP']} HP left!")
+        print(f"{attacker['Name']} dealt {damage} damage to {target['Name']}")
+        target['HP'] -= damage
+        print(f"{target['Name']} has {target['HP']} HP left!")
 
 
 def dropsXP(enemy):
@@ -32,6 +34,8 @@ def dropsXP(enemy):
     while player['Experience'] >= player['Next Level']:
         player['Level'] += 1
         player['Next Level'] += 5
+        player['AvailablePoints'] += 1
+    player['HP'] = 100 + (player['Level'] * 20)
 
 
 def generateEnemy():
@@ -47,7 +51,11 @@ def generateEnemy():
                 {"Weapon": 0},
                 {"Shield": random.randint(
                     player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
-            ]
+            ],
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 1},
+            ],
 
         },
 
@@ -62,7 +70,11 @@ def generateEnemy():
                 {"Weapon": 0},
                 {"Shield": random.randint(
                     player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
-            ]
+            ],
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 1},
+            ],
         },
 
         {
@@ -76,7 +88,11 @@ def generateEnemy():
                 {"Weapon": 5},
                 {"Shield": random.randint(
                     player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
-            ]
+            ],
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 1},
+            ],
         },
 
         {
@@ -90,7 +106,11 @@ def generateEnemy():
                 {"Weapon": 2},
                 {"Shield": random.randint(
                     player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
-            ]
+            ],
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 1},
+            ],
         },
 
         {
@@ -104,7 +124,11 @@ def generateEnemy():
                 {"Weapon": 10},
                 {"Shield": random.randint(
                     player['Level'] - 5 if player['Level'] - 5 > 0 else 1, player['Level'] + 5)},
-            ]
+            ],
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 1},
+            ],
         },
     ]
     generatedEnemy = random.randint(0, len(enemiesList) - 1)
@@ -242,12 +266,17 @@ player = {
     "Level": 1,
     "Experience": 0,
     "Next Level": 5,
+    "AvailablePoints": 0,
     "Buffed": False,
     "Money": 999,
     "Equipped": [
         {"Weapon": 0},
         {"Shield": 0},
-    ]
+    ],
+    "Stats": [
+        {"Attribute": "Strength", "Value": 1},
+        {"Attribute": "Dexterity", "Value": 1},
+    ],
 
 }
 
@@ -324,6 +353,57 @@ def sellingItems():
         print("Invalid item!")
 
 
+def showStats():
+    print(f"HP: {player['HP']}\nLevel: {player['Level']}\nAvailable points: {player['AvailablePoints']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
+    print("Inventory: ")
+    for i in range(0, len(player['Inventory'])):
+        print(
+            f"\t{i + 1}) {player['Inventory'][i]['Name']} - {player['Inventory'][i]['Quantity']}")
+        if player['Inventory'][i]['Type'] == 'Weapon':
+            print(
+                f"\t\tAttack Damage: {player['Inventory'][i]['Attack Damage']}")
+            if player['Inventory'][i]['Attack Damage'] > player['Equipped'][0]['Weapon']:
+                player['Equipped'][0]['Weapon'] = player['Inventory'][i]['Attack Damage']
+        if player['Inventory'][i]['Type'] == 'Armor':
+            print(
+                f"\t\tDefense Rating: {player['Inventory'][i]['Defense Rating']}")
+            if player['Inventory'][i]['Defense Rating'] > player['Equipped'][1]['Shield']:
+                player['Equipped'][1]['Shield'] = player['Inventory'][i]['Defense Rating']
+    print("Stats:")
+    for i in range(0, len(player['Stats'])):
+        print(
+            f"{player['Stats'][i]['Attribute']} - {player['Stats'][i]['Value']}")
+    print("1) Level up")
+    print("2) Return")
+    playerChoice = getPlayerInput()
+
+    if playerChoice == 1:
+        while True:
+            print(f"Available points: {player['AvailablePoints']}")
+            print("Which attribute would you like to level up?")
+            for i in range(0, len(player['Stats'])):
+                print(
+                    f"{i}) {player['Stats'][i]['Attribute']} - {player['Stats'][i]['Value']}")
+            print(f"{i + 1}) Return")
+            levelUpIndex = getPlayerInput()
+            if levelUpIndex == i + 1:
+                break
+            else:
+                try:
+                    if player['AvailablePoints'] > 0:
+                        player['Stats'][levelUpIndex]['Value'] += 1
+                        player['AvailablePoints'] -= 1
+                    else:
+                        print("No points available!")
+                        break
+                except IndexError:
+                    print("Invalid attribute!")
+                except TypeError:
+                    print("Invalid attribute!")
+    elif playerChoice == 2:
+        return
+
+
 def combat(enemy):
     print(
         f"You found an enemy! It is a level {enemy['Level']} {enemy['Name'] } with {enemy['HP']} HP")
@@ -366,6 +446,7 @@ def combat(enemy):
 
     if player['HP'] <= 0:
         print("YOU DIED")
+        player['HP'] = 100 + (player['Level'] * 20)
         return
     print(
         f"You killed {enemy['Name']} and you got {enemy['XPDrop']} experience points!")
@@ -395,7 +476,7 @@ def main():
         print("2) Shop")
         playerChoice = int(input())
         if playerChoice == 1:
-            player['HP'] = 100
+            player['HP'] = 100 + (player['Level'] * 20)
             print("You have been healed to full!")
         elif playerChoice == 2:
             shop = shopGenerator()
@@ -421,23 +502,7 @@ def main():
             else:
                 sellingItems()
     elif playerChoice == 3:
-        print(
-            f"HP: {player['HP']}\nLevel: {player['Level']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
-        print("Inventory: ")
-        for i in range(0, len(player['Inventory'])):
-            print(
-                f"\t{i + 1}) {player['Inventory'][i]['Name']} - {player['Inventory'][i]['Quantity']}")
-            if player['Inventory'][i]['Type'] == 'Weapon':
-                print(
-                    f"\t\tAttack Damage: {player['Inventory'][i]['Attack Damage']}")
-                if player['Inventory'][i]['Attack Damage'] > player['Equipped'][0]['Weapon']:
-                    player['Equipped'][0]['Weapon'] = player['Inventory'][i]['Attack Damage']
-            if player['Inventory'][i]['Type'] == 'Armor':
-                print(
-                    f"\t\tDefense Rating: {player['Inventory'][i]['Defense Rating']}")
-                if player['Inventory'][i]['Defense Rating'] > player['Equipped'][1]['Shield']:
-                    player['Equipped'][1]['Shield'] = player['Inventory'][i]['Defense Rating']
-
+        showStats()
     elif playerChoice == 4:
         exit()
 
