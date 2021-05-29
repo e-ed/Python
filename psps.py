@@ -2,7 +2,53 @@ import random
 import time
 
 
+def characterCreation():
+
+    name = str(input("Choose a name: "))
+
+    classList = [
+        {
+            "Name": "Knight",
+            "Stats": [
+                {"Attribute": "Strength", "Value": 3},
+                {"Attribute": "Dexterity", "Value": 1},
+                {"Attribute": "Intelligence", "Value": 1},
+            ],
+        },
+        {
+            "Name": "Mage",
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 1},
+                {"Attribute": "Intelligence", "Value": 3},
+            ],
+
+        },
+        {
+            "Name": "Assassin",
+            "Stats": [
+                {"Attribute": "Strength", "Value": 1},
+                {"Attribute": "Dexterity", "Value": 3},
+                {"Attribute": "Intelligence", "Value": 1},
+            ]
+        },
+    ]
+
+    print("Choose a class: ")
+    for i in range(0, len(classList)):
+        print(f"{i}) {classList[i]['Name']}")
+
+    playerChoice = getPlayerInput()
+
+    playerClass = classList[playerChoice]['Name']
+
+    player['Name'] = name
+    player['Class'] = playerClass
+    player['Stats'] = classList[playerChoice]['Stats']
+
+
 def attack(attacker, target):
+    print(f"\n")
     # dodge chance based on dexterity
     if random.randint(0, 100) <= target['Stats'][1]['Value']:
         print("Missed!")
@@ -239,6 +285,7 @@ def shopGenerator():
 
 player = {
     "Name": "You",
+    "Class": "class",
     "HP": 100,
     "Mana": 100,
     "Inventory": [
@@ -276,6 +323,7 @@ player = {
     "Stats": [
         {"Attribute": "Strength", "Value": 1},
         {"Attribute": "Dexterity", "Value": 1},
+        {"Attribute": "Intelligence", "Value": 1},
     ],
 
 }
@@ -354,7 +402,9 @@ def sellingItems():
 
 
 def showStats():
-    print(f"HP: {player['HP']}\nLevel: {player['Level']}\nAvailable points: {player['AvailablePoints']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
+    print(f"\n")
+    print(f"Name: {player['Name']}")
+    print(f"HP: {player['HP']}\nLevel: {player['Level']}\nClass: {player['Class']}\nAvailable points: {player['AvailablePoints']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
     print("Inventory: ")
     for i in range(0, len(player['Inventory'])):
         print(
@@ -410,9 +460,10 @@ def combat(enemy):
 
     while (enemy["HP"] > 0 and player['HP'] > 0):
 
-        print(f"You: Level {player['Level']} HP: {player['HP']}")
+        print(f"{player['Name']}: Level {player['Level']} HP: {player['HP']}")
 
         while True:
+            print(f"\n")
             print("1) Attack")
             print("2) Use item")
             playerChoice = getPlayerInput()
@@ -459,9 +510,11 @@ def getPlayerInput():
         return playerChoice
     except ValueError:
         return
+    print(f"\n")
 
 
 def main():
+
     print("Where would you like to go?")
     print("1) Forest")
     print("2) Town")
@@ -507,5 +560,6 @@ def main():
         exit()
 
 
+characterCreation()
 while __name__ == '__main__':
     main()
