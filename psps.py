@@ -2,8 +2,14 @@ import random
 import time
 
 
+# pygametest branch
+
+
 def attack(attacker, target):
     print("aaa")
+    print("aaa")
+    print("aaa")
+
     # dodge chance based on dexterity
     if random.randint(0, 100) <= target['Stats'][1]['Value']:
         print("Missed!")
