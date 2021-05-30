@@ -14,6 +14,16 @@ def characterCreation():
                 {"Attribute": "Dexterity", "Value": 1},
                 {"Attribute": "Intelligence", "Value": 1},
             ],
+            "Abilities": [
+                {
+                    "Name": "Shield Slam",
+                    "Type": "Damaging",
+                    "Damage": 5,
+                    "Mana Cost": 10,
+                },
+
+
+            ],
         },
         {
             "Name": "Mage",
@@ -21,6 +31,16 @@ def characterCreation():
                 {"Attribute": "Strength", "Value": 1},
                 {"Attribute": "Dexterity", "Value": 1},
                 {"Attribute": "Intelligence", "Value": 3},
+            ],
+            "Abilities": [
+                {
+                    "Name": "Fireball",
+                    "Type": "Damaging",
+                    "Damage": 12,
+                    "Mana Cost": 20,
+                },
+
+
             ],
 
         },
@@ -30,6 +50,14 @@ def characterCreation():
                 {"Attribute": "Strength", "Value": 1},
                 {"Attribute": "Dexterity", "Value": 3},
                 {"Attribute": "Intelligence", "Value": 1},
+            ],
+            "Abilities": [
+                {
+                    "Name": "Backstab",
+                    "Type": "Damaging",
+                    "Damage": 7,
+                    "Mana Cost": 5,
+                },
             ]
         },
     ]
@@ -45,6 +73,7 @@ def characterCreation():
     player['Name'] = name
     player['Class'] = playerClass
     player['Stats'] = classList[playerChoice]['Stats']
+    player['Abilities'] = classList[playerChoice]['Abilities']
 
 
 def attack(attacker, target):
@@ -326,6 +355,8 @@ player = {
         {"Attribute": "Intelligence", "Value": 1},
     ],
 
+    "Abilities": []
+
 }
 
 
@@ -401,7 +432,18 @@ def sellingItems():
         print("Invalid item!")
 
 
+def equipStuff():
+    for i in range(0, len(player['Inventory'])):
+        if player['Inventory'][i]['Type'] == 'Weapon':
+            if player['Inventory'][i]['Attack Damage'] > player['Equipped'][0]['Weapon']:
+                player['Equipped'][0]['Weapon'] = player['Inventory'][i]['Attack Damage']
+        if player['Inventory'][i]['Type'] == 'Armor':
+            if player['Inventory'][i]['Defense Rating'] > player['Equipped'][1]['Shield']:
+                player['Equipped'][1]['Shield'] = player['Inventory'][i]['Defense Rating']
+
+
 def showStats():
+    equipStuff()
     print(f"\n")
     print(f"Name: {player['Name']}")
     print(f"HP: {player['HP']}\nLevel: {player['Level']}\nClass: {player['Class']}\nAvailable points: {player['AvailablePoints']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
@@ -412,17 +454,21 @@ def showStats():
         if player['Inventory'][i]['Type'] == 'Weapon':
             print(
                 f"\t\tAttack Damage: {player['Inventory'][i]['Attack Damage']}")
-            if player['Inventory'][i]['Attack Damage'] > player['Equipped'][0]['Weapon']:
-                player['Equipped'][0]['Weapon'] = player['Inventory'][i]['Attack Damage']
+            """ if player['Inventory'][i]['Attack Damage'] > player['Equipped'][0]['Weapon']:
+                player['Equipped'][0]['Weapon'] = player['Inventory'][i]['Attack Damage'] """
         if player['Inventory'][i]['Type'] == 'Armor':
             print(
                 f"\t\tDefense Rating: {player['Inventory'][i]['Defense Rating']}")
-            if player['Inventory'][i]['Defense Rating'] > player['Equipped'][1]['Shield']:
-                player['Equipped'][1]['Shield'] = player['Inventory'][i]['Defense Rating']
-    print("Stats:")
+            """ if player['Inventory'][i]['Defense Rating'] > player['Equipped'][1]['Shield']:
+                player['Equipped'][1]['Shield'] = player['Inventory'][i]['Defense Rating'] """
     for i in range(0, len(player['Stats'])):
         print(
             f"{player['Stats'][i]['Attribute']} - {player['Stats'][i]['Value']}")
+    print("\nAbitilies:")
+    for i in range(0, len(player['Abilities'])):
+        print(
+            f"{player['Abilities'][i]['Name']} - {player['Abilities'][i]['Damage']} damage")
+        print(f"Mana cost: {player['Abilities'][i]['Mana Cost']}")
     print("1) Level up")
     print("2) Return")
     playerChoice = getPlayerInput()
@@ -454,6 +500,16 @@ def showStats():
         return
 
 
+def useAbility(attacker, target, index):
+    damage = attacker['Abilities'][index]['Damage']
+    target['HP'] -= damage
+    print(
+        f"{attacker['Name']} used {attacker['Abilities'][index]['Name']} on {target['Name']}!")
+    print(
+        f"{attacker['Name']} dealt {attacker['Abilities'][index]['Damage']} damage to {target['Name']}!")
+    print(f"{target['Name']} has {target['HP']} HP left!")
+
+
 def combat(enemy):
     print(
         f"You found an enemy! It is a level {enemy['Level']} {enemy['Name'] } with {enemy['HP']} HP")
@@ -466,8 +522,9 @@ def combat(enemy):
             print(f"\n")
             print("1) Attack")
             print("2) Use item")
+            print("3) Use ability")
             playerChoice = getPlayerInput()
-            if playerChoice == 1 or playerChoice == 2:
+            if playerChoice == 1 or playerChoice == 2 or playerChoice == 3:
                 break
 
         if playerChoice == 1:
@@ -488,6 +545,14 @@ def combat(enemy):
                     print("Invalid item!")
             print(player['Inventory'][itemChoice - 1]['Name'])
             useItem(player['Inventory'][itemChoice - 1]['Name'])
+        elif playerChoice == 3:
+            for i in range(0, len(player['Abilities'])):
+                print(f"{i}){player['Abilities'][i]['Name']}")
+            abilityIndex = getPlayerInput()
+            if player['Mana'] >= player['Abilities'][i]['Mana Cost']:
+                useAbility(player, enemy, abilityIndex)
+                if enemy['HP'] <= 0:
+                    break
 
         print("The enemy is about to attack you.")
         time.sleep(1)
