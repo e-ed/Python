@@ -446,7 +446,7 @@ def showStats():
     equipStuff()
     print(f"\n")
     print(f"Name: {player['Name']}")
-    print(f"HP: {player['HP']}\nLevel: {player['Level']}\nClass: {player['Class']}\nAvailable points: {player['AvailablePoints']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
+    print(f"HP: {player['HP']}\nLevel: {player['Level']}\nClass: {player['Class']}\nMana: {player['Mana']}\nAvailable points: {player['AvailablePoints']}\nMoney: {player['Money']}\nXP: {player['Experience']}\nXP For Next Level: {player['Next Level']} \n Attack Damage: {player['Equipped'][0]['Weapon']}\n Defense Rating: {player['Equipped'][1]['Shield']}")
     print("Inventory: ")
     for i in range(0, len(player['Inventory'])):
         print(
@@ -468,7 +468,7 @@ def showStats():
     for i in range(0, len(player['Abilities'])):
         print(
             f"{player['Abilities'][i]['Name']} - {player['Abilities'][i]['Damage']} damage")
-        print(f"Mana cost: {player['Abilities'][i]['Mana Cost']}")
+        print(f"\tMana cost: {player['Abilities'][i]['Mana Cost']}")
     print("1) Level up")
     print("2) Return")
     playerChoice = getPlayerInput()
@@ -501,13 +501,20 @@ def showStats():
 
 
 def useAbility(attacker, target, index):
-    damage = attacker['Abilities'][index]['Damage']
-    target['HP'] -= damage
-    print(
-        f"{attacker['Name']} used {attacker['Abilities'][index]['Name']} on {target['Name']}!")
-    print(
-        f"{attacker['Name']} dealt {attacker['Abilities'][index]['Damage']} damage to {target['Name']}!")
-    print(f"{target['Name']} has {target['HP']} HP left!")
+    try:
+        attacker['Mana'] -= attacker['Abilities'][index]['Mana Cost']
+        damage = attacker['Abilities'][index]['Damage'] + \
+            (0.2 * player['Stats'][2]['Value'])
+        target['HP'] -= damage
+        print(
+            f"{attacker['Name']} used {attacker['Abilities'][index]['Name']} on {target['Name']}!")
+        print(
+            f"{attacker['Name']} dealt {damage} damage to {target['Name']}!")
+        print(f"{target['Name']} has {target['HP']} HP left!")
+    except TypeError:
+        print("Invalid ability!")
+    except IndexError:
+        print("Invalid ability!")
 
 
 def combat(enemy):
@@ -546,6 +553,7 @@ def combat(enemy):
             print(player['Inventory'][itemChoice - 1]['Name'])
             useItem(player['Inventory'][itemChoice - 1]['Name'])
         elif playerChoice == 3:
+            print(f"Mana: {player['Mana']}")
             for i in range(0, len(player['Abilities'])):
                 print(f"{i}){player['Abilities'][i]['Name']}")
             abilityIndex = getPlayerInput()
@@ -553,6 +561,8 @@ def combat(enemy):
                 useAbility(player, enemy, abilityIndex)
                 if enemy['HP'] <= 0:
                     break
+            else:
+                print("Not enough mana!")
 
         print("The enemy is about to attack you.")
         time.sleep(1)
